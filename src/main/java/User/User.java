@@ -1,6 +1,7 @@
 package User;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
@@ -11,16 +12,19 @@ import java.util.UUID;
 
 import Content.*;
 
+
 public class User {
     private Map<UUID, Integer> Reacts = new HashMap<>();
     private List<Post> timeline = new ArrayList<>();
     private List<SubSeraphit> subSeraphits = new ArrayList<>();
+    private List<Post> myPosts = new ArrayList<>();
     private List<Post> savedPosts = new ArrayList<>();
     private List<Content> upVoted = new ArrayList<>();
     private String email;
     private String username;
     private String password;
     private int karma;
+    static Scanner input = new Scanner(System.in);
 
     public User(String email, String password) {
         this.email = DigestUtils.sha256Hex(email);
@@ -37,9 +41,16 @@ public class User {
     {
         return this.username;
     }
+    public String getPassword()
+    {
+        return password;
+    }
     public List<Post> getTimeline()
     {
         return timeline;
+    }
+    public List<Post> getMyPosts() {
+        return myPosts;
     }
     public int getKarma()
     {
@@ -66,28 +77,24 @@ public class User {
     {
         this.password = password;
     }
+    public void setTimeline(List<Post> newTimeline)
+    {
+        timeline = newTimeline;
+    }
     public void setKarma(int n)
     {
         karma += n;
     }
 
-    //checks if the string is a real email or not
-    public static boolean validateEmail(String email){
-        String regex = "^.{2,}@.{2,}\\..{3,}";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(email);
 
-        if (matcher.find()) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    //checks entered password with hashed password assigned to user
-    public boolean validatePassword(String enteredPassword) {
-        return DigestUtils.sha256Hex(enteredPassword).equals(this.password);
+    public void showProfile()
+    {
+        System.out.println("Username: " + this.username + "\n" +
+                "karma: " + this.karma + "\n" +
+                myPosts.size() + " posts\n" +
+                "User's interests:");
+        for(SubSeraphit sub : this.subSeraphits)
+            System.out.println("- " + sub.getTopic());
     }
 
 

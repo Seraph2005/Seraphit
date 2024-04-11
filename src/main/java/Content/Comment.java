@@ -1,7 +1,12 @@
 package Content;
 
-import Manager.Manager;
+import java.util.List;
+import java.util.ArrayList;
+
+import Manager.*;
 import User.*;
+
+import static Manager.Manager.checkAdministration;
 
 public class Comment extends Content{
 
@@ -9,32 +14,37 @@ public class Comment extends Content{
         super(seraphit, maker, body);
     }
 
-    public void removeComment(Post post, Comment comment, User user)
+    //functionallities in alphabeticall order
+    public static void newComment(Post post, User maker, String body){
+        Comment comment = new Comment(post.getSeraphit(), maker, body);
+        post.getComments().add(comment);
+    }
+
+    public static void removeComment(Post post, List<Comment> removed, User user)
     {
-        boolean access = false;
-        if(maker.getUsername().equals(user.getUsername()))
-            access = true;
-        for(User admin : comment.getAdmins())
+        for(Comment comment : removed)
         {
-            if(admin.getUsername().equals(user.getUsername())) {
+            boolean access = false;
+            if(post.getMaker().getUsername().equals(user.getUsername()))
                 access = true;
+            if(checkAdministration(comment.getSeraphit(), user))
+                access = true;
+            if(!access)
+            {
+                System.out.println("You don't have access to this option.");
+                Holder();
+                continue;
             }
-        }
-        if(!access)
-        {
-            System.out.println("You don't have access to this option.");
-            Holder();
-            return;
-        }
-        //removes comment from post comments
-        post.getComments().remove(comment);
+            //removes comment from post comments
+            post.getComments().remove(comment);
 
-        //changes maker's karma
-        maker.setKarma(comment.getKarma()*-1);
+            //changes maker's karma
+            post.getMaker().setKarma(comment.getKarma()*-1);
 
-        //removes the comment from members upvoted list
-        for(User member : seraphit.getMembers()){
-            member.getUpvoted().remove(comment);
+            //removes the comment from members upvoted list
+            for(User member : post.getSeraphit().getMembers()){
+                member.getUpvoted().remove(comment);
+            }
         }
     }
 

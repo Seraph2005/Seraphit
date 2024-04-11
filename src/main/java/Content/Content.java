@@ -2,7 +2,6 @@ package Content;
 
 import User.User;
 import User.SubSeraphit;
-import javafx.geometry.Pos;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +16,6 @@ public class Content{
     static Scanner input = new Scanner(System.in);
 
     public Content(SubSeraphit seraphit, User user, String body){
-        this.seraphit = seraphit;
         this.maker = user;
         this.body = body;
         this.seraphit = seraphit;
@@ -29,6 +27,10 @@ public class Content{
     public String getBody()
     {
         return body;
+    }
+    public SubSeraphit getSeraphit()
+    {
+        return seraphit;
     }
     public User getMaker()
     {
@@ -51,12 +53,13 @@ public class Content{
     public static void newPost(Post post, SubSeraphit sub)
     {
         sub.getPosts().add(post);
+        post.getMaker().getMyPosts().add(post);
         for(User user : sub.getMembers()) {
             user.getTimeline().add(post);
         }
     }
 
-    public void React(Content content) {
+    public void React(Content content, User user) {
         System.out.println("Choose your reaction:\n" +
                 "-1 for DownVote\n" +
                 " 0 for retract\n" +
@@ -64,19 +67,19 @@ public class Content{
         int react = input.nextInt();
 
         //changes karma points based on reaction and controls if the user has reacted before or not
-        if (maker.getReacts().containsKey(ID)) {
-            int karmaChanges = react - maker.getReacts().get(ID);
+        if (user.getReacts().containsKey(ID)) {
+            int karmaChanges = react - user.getReacts().get(ID);
             setKarma(karmaChanges);
         }
         else {
             setKarma(react);
         }
-        maker.getReacts().put(ID, react);
+        user.getReacts().put(ID, react);
 
         //removes the content from upvoted list or adds it if necessary
         if(react == 1) {
             boolean inList = false;
-            for(Content c : maker.getUpvoted())
+            for(Content c : user.getUpvoted())
             {
                 if(c.ID == content.ID){
                     inList = true;
@@ -84,13 +87,13 @@ public class Content{
                 }
             }
             if(!inList)
-                maker.getUpvoted().add(content);
+                user.getUpvoted().add(content);
         }
         else{
-            for(Content c : maker.getUpvoted())
+            for(Content c : user.getUpvoted())
             {
                 if(c.ID == content.ID) {
-                    maker.getUpvoted().remove(content);
+                    user.getUpvoted().remove(content);
                     break;
                 }
             }

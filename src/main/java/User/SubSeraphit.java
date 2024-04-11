@@ -5,19 +5,16 @@ import Content.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.UUID;
-import org.apache.commons.codec.digest.DigestUtils;
 
 public class SubSeraphit {
     private List<User> admins = new ArrayList<>();
     private List<User> members = new ArrayList<>();
     private List<Post> posts = new ArrayList<>();
     private String topic;
-    private UUID ID;
+    static Scanner input = new Scanner(System.in);
 
     public SubSeraphit(String topic){
         this.topic = topic;
-        ID = UUID.randomUUID();
     }
 
     //Getters and Setters
@@ -36,4 +33,32 @@ public class SubSeraphit {
     {
         return posts;
     }
+
+    //Functionalities
+    public void LeaveSubSeraphit(User user) {
+        //removing subseraphit from users subs
+        for(SubSeraphit sub : user.getSubSeraphits()) {
+            if (sub.getTopic().equals(topic)) {
+                user.getSubSeraphits().remove(sub);
+                break;
+            }
+        }
+
+        //removing member from sub members
+        members.remove(user);
+
+        //removing sub posts from user's timeline
+        List<Post> newTimeline = new ArrayList<>();
+        newTimeline.addAll(user.getTimeline());
+        for(Post post : user.getTimeline())
+        {
+            if(post.getSeraphit().getTopic().equals(topic))
+                newTimeline.remove(post);
+        }
+        user.setTimeline(newTimeline);
+    }
+
+
+
+
 }

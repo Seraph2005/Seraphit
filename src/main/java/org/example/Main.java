@@ -9,15 +9,15 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import Manager.Manager;
+import Manager.*;
 import User.User;
 import User.SubSeraphit;
 import Content.Post;
 import Content.Comment;
 
 import static Content.Content.newPost;
-import static Manager.Manager.IsSigned;
-import static Manager.Manager.getUsers;
+import static Manager.ContentManager.*;
+import static Manager.Manager.*;
 
 
 public class Main {
@@ -64,11 +64,11 @@ public class Main {
         String password = input.next();
         //LogIn
         if (task == 1) {
-            Boolean inList = false;
+            boolean inList = false;
             for (User user : Manager.getUsers()) {
                 if (user.getEmail().equals(DigestUtils.sha256Hex(email))) {
                     inList = true;
-                    if (user.validatePassword(password))
+                    if (validatePassword(password, user))
                         UserMenu(user);
                     else {
                         System.out.println("Password is not correct.");
@@ -84,7 +84,7 @@ public class Main {
         }
         //SignUp
         else if (task == 2) {
-            if (!User.validateEmail(email)) {
+            if (!validateEmail(email)) {
                 System.out.println("Email is not acceptable.");
             } else if (IsSigned(email)) {
                 System.out.println("This email has already signed up.");
@@ -103,53 +103,76 @@ public class Main {
 
     public static void UserMenu(User user) {
         int task = 0;
-        while (task != 12) {
+        while (task != 11) {
             ClearScreen();
             System.out.println("Welcome to your dashboard, " + user.getUsername() + ".\n" +
                     "Your karma: " + user.getKarma() + "\n" +
                     "What do you wish to do?\n" +
                     " 1- Show my timeline\n" +
                     " 2- Manage SubSeraphits\n" +
-                    " 3- My inbox\n" +
+                    " 3- Create SubSeraphit\n" +
                     " 4- Search Users/SubSeraphists\n" +
                     " 5- Show my posts\n" +
-                    " 6- Show my comments\n" +
-                    " 7- Upvoted posts\n" +
-                    " 8- Upvoted comments\n" +
-                    " 9- My saved posts\n" +
-                    "10- Change username\n" +
-                    "11- Change Password\n" +
-                    "12- LogOut");
+                    " 6- Upvoted posts\n" +
+                    " 7- Upvoted comments\n" +
+                    " 8- My saved posts\n" +
+                    " 9- Change username\n" +
+                    "10- Change Password\n" +
+                    "11- Logout");
             task = input.nextInt();
             switch (task) {
                 case 1://show timeline and lets user add comment or react contents
                 {
-                    for (Post post : user.getTimeline()) {
-                        int postTask = 0;
-                        while (postTask != 5) {
-                            ClearScreen();
-                            post.showPost();
-                            System.out.println("\n1- Show comments\n" +
-                                    "2- React\n" +
-                                    "3- Save post\n" +
-                                    "4- Remove post\n" +
-                                    "5- Next");
-                            postTask = input.nextInt();
-                            switch (postTask) {
-                                case 1:
-                                    post.showComments(user, post); break;
-                                case 2:
-                                    post.React(post); break;
-                                case 3:
-                                    user.getSavedPosts().add(post); break;
-                                case 4:
-                                    post.removePost(post, user); break;
-                            }
-                        }
-                    }
+                    showPost(user.getTimeline(), user);
                     break;
                 }
+                case 2://see and make posts in sub, see users and their profile, leaving sub
+                    //admin: change topic, add new admin, remove user
+                {
+                    for(SubSeraphit seraphit : user.getSubSeraphits()){
+                        showSeraphit(seraphit);
+                    }
+                    System.out.print("Enter subSeraphit's topic: ");
+                    String topic = input.next();
+                    for(SubSeraphit sub : user.getSubSeraphits()) {
+                        if(sub.getTopic().equals(topic)) {
+                            manageSubSeraphit(sub, user);
+                            break;
+                        }
+                    }
+                }
+                case 3: //create subseraphit
+                {
 
+                }
+                case 4: //search
+                {
+
+                }
+                case 5: //my posts
+                {
+
+                }
+                case 6: //upvoted posts
+                {
+
+                }
+                case 7: //upvoted comments
+                {
+
+                }
+                case 8: //saved posts
+                {
+
+                }
+                case 9://change pass
+                {
+
+                }
+                case 10: //change username
+                {
+
+                }
             }
         }
     }
