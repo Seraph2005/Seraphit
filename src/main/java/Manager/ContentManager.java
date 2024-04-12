@@ -1,6 +1,7 @@
 package Manager;
 
 import Content.Comment;
+import Content.Content;
 import Content.Post;
 import User.*;
 
@@ -12,20 +13,85 @@ import static Content.Comment.newComment;
 import static Content.Comment.removeComment;
 import static Content.Content.newPost;
 import static Content.Post.removePost;
+import static Manager.Manager.checkAdministration;
 
 public abstract class ContentManager {
-    private static List<Post> AllPosts = new ArrayList<>();
+    private static List<Post> allPosts = new ArrayList<>();
+    private static List<SubSeraphit> allSubs = new ArrayList<>();
     static Scanner input = new Scanner(System.in);
     static Scanner in = new Scanner(System.in);
 
     //Getters and setters
     public static List<Post> getAllPosts()
     {
-        return AllPosts;
+        return allPosts;
+    }
+    public static List<SubSeraphit> getAllSubs()
+    {
+        return allSubs;
     }
 
-
     //Functionalities
+    public static void AdminEdition(User admin, SubSeraphit sub) {
+        //Lets admin change topic, add new admin and remove members
+        ClearScreen();
+        System.out.println("Admin Options:\n" +
+                "1- change topic\n" +
+                "2- add new admin\n" +
+                "3- remove members\n");
+        int task = input.nextInt();
+        ClearScreen();
+        switch (task)
+        {
+            case 1://change topic
+            {
+                System.out.print("Enter the topic: ");
+                String topic = input.next();
+                if(validateTopic(topic))
+                    sub.setTopic(topic);
+                else {
+                    System.out.println("This topic is already taken.");
+                    Holder();
+                }
+            }
+            case 2://new admin
+            {
+                for(User user : sub.getMembers())
+                {
+                    if(!sub.getAdmins().contains(user))
+                        System.out.println("- " + user.getUsername());
+                }
+                System.out.print("Enter new admin's username: ");
+                String newAdmin = input.next();
+                for(User user : sub.getMembers())
+                {
+                    if(user.getUsername().equals(newAdmin)) {
+                        if(!checkAdministration(sub, user))
+                            sub.getAdmins().add(user);
+                        break;
+                    }
+                }
+            }
+            case 3://remove members
+            {
+                for(User user : sub.getMembers())
+                {
+                    if(!sub.getAdmins().contains(user))
+                        System.out.println("- " + user.getUsername());
+                }
+                System.out.print("Enter new admin's username: ");
+                String newAdmin = input.next();
+                for(User user : sub.getMembers())
+                {
+                    if(user.getUsername().equals(newAdmin)) {
+                        sub.LeaveSubSeraphit(user);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     public static void manageSubSeraphit(SubSeraphit sub, User user){
         //see and make posts in sub, see users and their profile, leaving sub
         //if admin: change topic, add new admin, remove member
@@ -58,6 +124,7 @@ public abstract class ContentManager {
                 String body = in.nextLine();
                 Post p = new Post(sub, user, title, body);
                 newPost(p, sub);
+                user.getMyPosts().add(p);
                 break;
             }
             case 3://see members
@@ -85,9 +152,51 @@ public abstract class ContentManager {
                 sub.LeaveSubSeraphit(user);
                 break;
             }
-            case 5://info
+            case 5://edit info
             {
+                if(checkAdministration(sub, user))
+                    AdminEdition(user, sub);
+                else{
+                    System.out.println("You don't have access to this option.");
+                    Holder();
+                }
+            }
+        }
+    }
 
+    public static void searchSub(User user) {
+        System.out.print("Find: ");
+        String name = input.next();
+        name = name.toLowerCase();
+        boolean found = false;
+        for(SubSeraphit sub : allSubs){
+            if(sub.getTopic().toLowerCase().contains(name)){
+                found = true;
+                System.out.println("- " + sub.getTopic());
+            }
+        }
+        if(!found)
+        {
+            System.out.println("Nothing was found.");
+            Holder();
+        }
+        else
+        {
+            System.out.print("Which one did you mean? ");
+            String topic = input.next();
+            ClearScreen();
+            for(SubSeraphit sub : allSubs){
+                if(sub.getTopic().equals(topic)){
+                    showSeraphit(sub);
+                    System.out.println("Enter 1 to join.");
+                    String join = input.next();
+                    if(join.equals("1"))
+                    {
+                        sub.getMembers().add(user);
+                        user.getSubSeraphits().add(sub);
+                    }
+                    break;
+                }
             }
         }
     }
@@ -122,6 +231,25 @@ public abstract class ContentManager {
             System.out.print("text: ");
             String body = in.nextLine();
             newComment(post, user, body);
+        }
+    }
+
+    public static void showUpComments(User user){
+        for(Comment comment: user.getUpComment()) {
+            int task = 0;
+            while(task != 1)
+            {
+                ClearScreen();
+                System.out.println(comment.getMaker().getUsername() + "\n" +
+                        comment.getBody() + "\n" +
+                        "karma: " + comment.getKarma() +
+                        "\n\n1- next\n" +
+                        "2- react\n");
+                task = input.nextInt();
+                if(task == 2) {
+                    comment.React(comment, user);
+                }
+            }
         }
     }
 
@@ -163,9 +291,15 @@ public abstract class ContentManager {
                 sub.getPosts().size() + " posts\n");
     }
 
-
-
-
+    //see if this topic is already taken
+    public static boolean validateTopic(String topic){
+        for (SubSeraphit sub : allSubs)
+        {
+            if(sub.getTopic().equals(topic))
+                return false;
+        }
+        return true;
+    }
 
 
 

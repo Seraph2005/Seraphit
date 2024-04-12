@@ -18,6 +18,7 @@ import Content.Comment;
 import static Content.Content.newPost;
 import static Manager.ContentManager.*;
 import static Manager.Manager.*;
+import static User.SubSeraphit.createSubSeraphit;
 
 
 public class Main {
@@ -34,6 +35,7 @@ public class Main {
         getUsers().add(member);
         //SubSeraphit
         SubSeraphit seraphim = new SubSeraphit("Seraphims");
+
         seraphim.getAdmins().add(admin);
         seraphim.getMembers().add(admin);
         admin.getSubSeraphits().add(seraphim);
@@ -140,38 +142,54 @@ public class Main {
                             break;
                         }
                     }
+                    break;
                 }
                 case 3: //create subseraphit
                 {
-
+                    System.out.print("topic: ");
+                    String topic = input.next();
+                    if(validateTopic(topic))
+                        createSubSeraphit(user, topic);
+                    break;
                 }
                 case 4: //search
                 {
-
+                    System.out.println("What are you looking for?\n" +
+                            "1- a user\n" +
+                            "2- a subseraphit");
+                    String search = input.next();
+                    switch (search)
+                    {
+                        case "1":
+                            searchUser(user); break;
+                        case "2":
+                            searchSub(user); break;
+                    }
+                    break;
                 }
                 case 5: //my posts
-                {
-
-                }
+                    showPost(user.getMyPosts(), user); break;
                 case 6: //upvoted posts
-                {
-
-                }
+                    showPost(user.getUpPost(), user); break;
                 case 7: //upvoted comments
-                {
-
-                }
+                    showUpComments(user); break;
                 case 8: //saved posts
+                    showPost(user.getSavedPosts(), user); break;
+                case 9: //change pass
                 {
-
-                }
-                case 9://change pass
-                {
-
+                    System.out.print("Enter th new password: ");
+                    String newPass = input.next();
+                    if(newPass.length() > 6)
+                        user.setPassword(newPass);
                 }
                 case 10: //change username
                 {
-
+                    System.out.print("Enter th new username: ");
+                    String newUsername = input.next();
+                    if(validateUsername(newUsername) && newUsername.length() > 2)
+                        user.setUsername(newUsername);
+                    else
+                        System.out.println("This username is not acceptable."); Holder();
                 }
             }
         }

@@ -18,8 +18,7 @@ public class Post extends Content{
     static Scanner input = new Scanner(System.in);
     static Scanner in = new Scanner(System.in);
 
-    public Post(SubSeraphit seraphit, User user, String title, String body)
-    {
+    public Post(SubSeraphit seraphit, User user, String title, String body) {
         super(seraphit, user, body);
         this.title = title;
     }
@@ -34,10 +33,8 @@ public class Post extends Content{
         return title;
     }
 
-
     //Functionalities in alphabetical order
-    public static void removePost(List<Post> removed, User user)
-    {
+    public static void removePost(List<Post> removed, User user) {
         for(Post post : removed)
         {
             boolean access = false;
@@ -65,7 +62,7 @@ public class Post extends Content{
 
             //removes the post from members upvoted list
             for(User member : post.getSeraphit().getMembers()){
-                member.getUpvoted().remove(post);
+                member.getUpPost().remove(post);
             }
 
             //removes the post from all users savedList
@@ -73,9 +70,6 @@ public class Post extends Content{
                 u.getSavedPosts().remove(post);
         }
     }
-
-
-
 
 
 

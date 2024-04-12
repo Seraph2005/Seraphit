@@ -20,8 +20,7 @@ public class Comment extends Content{
         post.getComments().add(comment);
     }
 
-    public static void removeComment(Post post, List<Comment> removed, User user)
-    {
+    public static void removeComment(Post post, List<Comment> removed, User user) {
         for(Comment comment : removed)
         {
             boolean access = false;
@@ -43,11 +42,10 @@ public class Comment extends Content{
 
             //removes the comment from members upvoted list
             for(User member : post.getSeraphit().getMembers()){
-                member.getUpvoted().remove(comment);
+                member.getUpComment().remove(comment);
             }
         }
     }
-
 
 
 }

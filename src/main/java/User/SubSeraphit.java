@@ -1,6 +1,7 @@
 package User;
 
 import Content.*;
+import Manager.*;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -34,7 +35,19 @@ public class SubSeraphit {
         return posts;
     }
 
+    public void setTopic(String topic)
+    {
+        this.topic = topic;
+    }
+
     //Functionalities
+    public static void createSubSeraphit(User admin, String topic){
+        SubSeraphit sub = new SubSeraphit(topic);
+        sub.getAdmins().add(admin);
+        sub.getMembers().add(admin);
+        admin.getSubSeraphits().add(sub);
+    }
+
     public void LeaveSubSeraphit(User user) {
         //removing subseraphit from users subs
         for(SubSeraphit sub : user.getSubSeraphits()) {
@@ -57,7 +70,6 @@ public class SubSeraphit {
         }
         user.setTimeline(newTimeline);
     }
-
 
 
 

@@ -3,6 +3,7 @@ package Content;
 import User.User;
 import User.SubSeraphit;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Scanner;
@@ -49,9 +50,8 @@ public class Content{
         karma += n;
     }
 
-    //functionalities
-    public static void newPost(Post post, SubSeraphit sub)
-    {
+    //functionalities in alphabetical order
+    public static void newPost(Post post, SubSeraphit sub) {
         sub.getPosts().add(post);
         post.getMaker().getMyPosts().add(post);
         for(User user : sub.getMembers()) {
@@ -79,28 +79,44 @@ public class Content{
         //removes the content from upvoted list or adds it if necessary
         if(react == 1) {
             boolean inList = false;
-            for(Content c : user.getUpvoted())
+            if(content instanceof Post)
             {
-                if(c.ID == content.ID){
-                    inList = true;
-                    break;
+                for(Post p : user.getUpPost())
+                {
+                    if(p.ID == content.ID){
+                        inList = true;
+                        break;
+                    }
                 }
+                if(!inList)
+                    user.getUpPost().add(content);
             }
-            if(!inList)
-                user.getUpvoted().add(content);
+            else
+            {
+                for(Comment c : user.getUpComment())
+                {
+                    if(c.ID == content.ID){
+                        inList = true;
+                        break;
+                    }
+                }
+                if(!inList)
+                    user.getUpComment().add(content);
+            }
         }
         else{
-            for(Content c : user.getUpvoted())
+            if(content instanceof Post)
             {
-                if(c.ID == content.ID) {
-                    user.getUpvoted().remove(content);
-                    break;
-                }
+                if(user.getUpPost().contains(content))
+                    user.getUpPost().remove(content);
+            }
+            else
+            {
+                if(user.getUpComment().contains(content))
+                    user.getUpComment().remove(content);
             }
         }
     }
-
-
 
 
 

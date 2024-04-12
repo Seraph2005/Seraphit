@@ -19,7 +19,8 @@ public class User {
     private List<SubSeraphit> subSeraphits = new ArrayList<>();
     private List<Post> myPosts = new ArrayList<>();
     private List<Post> savedPosts = new ArrayList<>();
-    private List<Content> upVoted = new ArrayList<>();
+    private List<Comment> upComment = new ArrayList<>();
+    private List<Post> upPost = new ArrayList<>();
     private String email;
     private String username;
     private String password;
@@ -60,8 +61,11 @@ public class User {
     {
         return savedPosts;
     }
-    public List<Content> getUpvoted() {
-        return upVoted;
+    public List<Comment> getUpComment() {
+        return upComment;
+    }
+    public List<Post> getUpPost() {
+        return upPost;
     }
     public List<SubSeraphit> getSubSeraphits() {
         return subSeraphits;
@@ -75,7 +79,7 @@ public class User {
     }
     public void setPassword(String password)
     {
-        this.password = password;
+        this.password = DigestUtils.sha256Hex(password);
     }
     public void setTimeline(List<Post> newTimeline)
     {
@@ -87,8 +91,7 @@ public class User {
     }
 
 
-    public void showProfile()
-    {
+    public void showProfile() {
         System.out.println("Username: " + this.username + "\n" +
                 "karma: " + this.karma + "\n" +
                 myPosts.size() + " posts\n" +
