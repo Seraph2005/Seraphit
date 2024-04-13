@@ -1,52 +1,24 @@
 package org.example;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
 import Manager.*;
 import User.User;
 import User.SubSeraphit;
-import Content.Post;
-import Content.Comment;
 
-import static Content.Content.newPost;
 import static Manager.ContentManager.*;
 import static Manager.Manager.*;
 import static User.SubSeraphit.createSubSeraphit;
+import static User.SubSeraphit.validateTopic;
 
 
 public class Main {
     static Scanner input = new Scanner(System.in);
 
     public static void main(String[] args) {
-        //testers
-        //User
-        User admin = new User("admin@gmail.com", "ad");
-        admin.setUsername("admin");
-        getUsers().add(admin);
-        User member = new User("seraph@gmail.com", "ser");
-        member.setUsername("seraph");
-        getUsers().add(member);
-        //SubSeraphit
-        SubSeraphit seraphim = new SubSeraphit("Seraphims");
-
-        seraphim.getAdmins().add(admin);
-        seraphim.getMembers().add(admin);
-        admin.getSubSeraphits().add(seraphim);
-        seraphim.getMembers().add(member);
-        member.getSubSeraphits().add(seraphim);
-        //contents test
-        Post post = new Post(seraphim, admin, "test", "this is a test");
-        newPost(post, seraphim);
-        Comment adminComment = new Comment(seraphim, admin, "this cannot be removed by member");
-        post.getComments().add(adminComment);
-        adminComment.setKarma(5);
+        makeTestCases();
         while (true)
             runMenu();
     }
@@ -56,8 +28,8 @@ public class Main {
         System.out.println("Welcome To Seraphit!");
         System.out.println("What do you wish to do?");
         System.out.println("1- Login\n2- SignUp\n3- Quit");
-        int task = input.nextInt();
-        if (task == 3)
+        String task = input.next();
+        if (task.equals("3"))
             return;
         ClearScreen();
         System.out.print("Email: ");
@@ -65,7 +37,7 @@ public class Main {
         System.out.print("Password: ");
         String password = input.next();
         //LogIn
-        if (task == 1) {
+        if (task.equals("1")) {
             boolean inList = false;
             for (User user : Manager.getUsers()) {
                 if (user.getEmail().equals(DigestUtils.sha256Hex(email))) {
@@ -85,7 +57,7 @@ public class Main {
             }
         }
         //SignUp
-        else if (task == 2) {
+        else if (task.equals("2")) {
             if (!validateEmail(email)) {
                 System.out.println("Email is not acceptable.");
             } else if (IsSigned(email)) {
@@ -104,8 +76,8 @@ public class Main {
     }
 
     public static void UserMenu(User user) {
-        int task = 0;
-        while (task != 11) {
+        String task = "";
+        while (!task.equals("11")) {
             ClearScreen();
             System.out.println("Welcome to your dashboard, " + user.getUsername() + ".\n" +
                     "Your karma: " + user.getKarma() + "\n" +
@@ -121,21 +93,21 @@ public class Main {
                     " 9- Change username\n" +
                     "10- Change Password\n" +
                     "11- Logout");
-            task = input.nextInt();
+            task = input.next();
             switch (task) {
-                case 1://show timeline and lets user add comment or react contents
+                case "1"://show timeline and lets user add comment or react contents
                 {
                     showPost(user.getTimeline(), user);
                     break;
                 }
-                case 2://see and make posts in sub, see users and their profile, leaving sub
+                case "2"://see and make posts in sub, see users and their profile, leaving sub
                     //admin: change topic, add new admin, remove user
                 {
                     for(SubSeraphit seraphit : user.getSubSeraphits()){
                         showSeraphit(seraphit);
                     }
                     System.out.print("Enter subSeraphit's topic: ");
-                    String topic = input.next();
+                    String topic = input.nextLine();
                     for(SubSeraphit sub : user.getSubSeraphits()) {
                         if(sub.getTopic().equals(topic)) {
                             manageSubSeraphit(sub, user);
@@ -144,20 +116,20 @@ public class Main {
                     }
                     break;
                 }
-                case 3: //create subseraphit
+                case "3": //create subseraphit
                 {
                     System.out.print("topic: ");
-                    String topic = input.next();
+                    String topic = input.nextLine();
                     if(validateTopic(topic))
                         createSubSeraphit(user, topic);
                     break;
                 }
-                case 4: //search
+                case "4": //search
                 {
                     System.out.println("What are you looking for?\n" +
                             "1- a user\n" +
                             "2- a subseraphit");
-                    String search = input.next();
+                    String search = input.nextLine();
                     switch (search)
                     {
                         case "1":
@@ -167,25 +139,25 @@ public class Main {
                     }
                     break;
                 }
-                case 5: //my posts
+                case "5": //my posts
                     showPost(user.getMyPosts(), user); break;
-                case 6: //upvoted posts
+                case "6": //upvoted posts
                     showPost(user.getUpPost(), user); break;
-                case 7: //upvoted comments
+                case "7": //upvoted comments
                     showUpComments(user); break;
-                case 8: //saved posts
+                case "8": //saved posts
                     showPost(user.getSavedPosts(), user); break;
-                case 9: //change pass
+                case "9": //change pass
                 {
                     System.out.print("Enter th new password: ");
                     String newPass = input.next();
                     if(newPass.length() > 6)
                         user.setPassword(newPass);
                 }
-                case 10: //change username
+                case "10": //change username
                 {
                     System.out.print("Enter th new username: ");
-                    String newUsername = input.next();
+                    String newUsername = input.nextLine();
                     if(validateUsername(newUsername) && newUsername.length() > 2)
                         user.setUsername(newUsername);
                     else
@@ -196,6 +168,7 @@ public class Main {
     }
 
 
+    //Controlers
     public static void ClearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();

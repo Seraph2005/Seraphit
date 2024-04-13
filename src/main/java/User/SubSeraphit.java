@@ -1,18 +1,17 @@
 package User;
 
 import Content.*;
-import Manager.*;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Scanner;
+
+import static Manager.ContentManager.getAllSubs;
 
 public class SubSeraphit {
     private List<User> admins = new ArrayList<>();
     private List<User> members = new ArrayList<>();
     private List<Post> posts = new ArrayList<>();
     private String topic;
-    static Scanner input = new Scanner(System.in);
 
     public SubSeraphit(String topic){
         this.topic = topic;
@@ -40,9 +39,10 @@ public class SubSeraphit {
         this.topic = topic;
     }
 
-    //Functionalities
+    //Functionalities in alphabetical order
     public static void createSubSeraphit(User admin, String topic){
         SubSeraphit sub = new SubSeraphit(topic);
+        getAllSubs().add(sub);
         sub.getAdmins().add(admin);
         sub.getMembers().add(admin);
         admin.getSubSeraphits().add(sub);
@@ -71,6 +71,14 @@ public class SubSeraphit {
         user.setTimeline(newTimeline);
     }
 
-
+    //see if this topic is already taken
+    public static boolean validateTopic(String topic){
+        for (SubSeraphit sub : getAllSubs())
+        {
+            if(sub.getTopic().equals(topic))
+                return false;
+        }
+        return true;
+    }
 
 }

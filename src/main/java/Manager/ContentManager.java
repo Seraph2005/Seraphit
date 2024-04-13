@@ -1,7 +1,6 @@
 package Manager;
 
 import Content.Comment;
-import Content.Content;
 import Content.Post;
 import User.*;
 
@@ -11,42 +10,38 @@ import java.util.Scanner;
 
 import static Content.Comment.newComment;
 import static Content.Comment.removeComment;
-import static Content.Content.newPost;
+import static Content.Post.newPost;
 import static Content.Post.removePost;
 import static Manager.Manager.checkAdministration;
+import static User.SubSeraphit.validateTopic;
 
 public abstract class ContentManager {
-    private static List<Post> allPosts = new ArrayList<>();
     private static List<SubSeraphit> allSubs = new ArrayList<>();
     static Scanner input = new Scanner(System.in);
     static Scanner in = new Scanner(System.in);
 
     //Getters and setters
-    public static List<Post> getAllPosts()
-    {
-        return allPosts;
-    }
     public static List<SubSeraphit> getAllSubs()
     {
         return allSubs;
     }
 
-    //Functionalities
-    public static void AdminEdition(User admin, SubSeraphit sub) {
+    //Functionalities in alphabetical order
+    public static void AdminEdition(SubSeraphit sub) {
         //Lets admin change topic, add new admin and remove members
         ClearScreen();
         System.out.println("Admin Options:\n" +
                 "1- change topic\n" +
                 "2- add new admin\n" +
                 "3- remove members\n");
-        int task = input.nextInt();
+        String task = input.next();
         ClearScreen();
         switch (task)
         {
-            case 1://change topic
+            case "1"://change topic
             {
                 System.out.print("Enter the topic: ");
-                String topic = input.next();
+                String topic = input.nextLine();
                 if(validateTopic(topic))
                     sub.setTopic(topic);
                 else {
@@ -54,7 +49,7 @@ public abstract class ContentManager {
                     Holder();
                 }
             }
-            case 2://new admin
+            case "2"://new admin
             {
                 for(User user : sub.getMembers())
                 {
@@ -62,7 +57,7 @@ public abstract class ContentManager {
                         System.out.println("- " + user.getUsername());
                 }
                 System.out.print("Enter new admin's username: ");
-                String newAdmin = input.next();
+                String newAdmin = input.nextLine();
                 for(User user : sub.getMembers())
                 {
                     if(user.getUsername().equals(newAdmin)) {
@@ -72,7 +67,7 @@ public abstract class ContentManager {
                     }
                 }
             }
-            case 3://remove members
+            case "3"://remove members
             {
                 for(User user : sub.getMembers())
                 {
@@ -80,7 +75,7 @@ public abstract class ContentManager {
                         System.out.println("- " + user.getUsername());
                 }
                 System.out.print("Enter new admin's username: ");
-                String newAdmin = input.next();
+                String newAdmin = input.nextLine();
                 for(User user : sub.getMembers())
                 {
                     if(user.getUsername().equals(newAdmin)) {
@@ -105,21 +100,21 @@ public abstract class ContentManager {
                 "4- Leave SubSeraphit\n" +
                 "5- Edit info(only admin)\n" +
                 "What do you wish to do?");
-        int task = input.nextInt();
+        String task = input.next();
         ClearScreen();
         switch (task)
         {
-            case 1://see posts
+            case "1"://see posts
             {
                 for(Post post : sub.getPosts()) {
                     showPost(sub.getPosts(), user);
                 }
                 break;
             }
-            case 2://new post
+            case "2"://new post
             {
                 System.out.println("Title: ");
-                String title = input.next();
+                String title = input.nextLine();
                 System.out.println("Text: ");
                 String body = in.nextLine();
                 Post p = new Post(sub, user, title, body);
@@ -127,7 +122,7 @@ public abstract class ContentManager {
                 user.getMyPosts().add(p);
                 break;
             }
-            case 3://see members
+            case "3"://see members
             {
                 for(User member : sub.getMembers())
                 {
@@ -135,7 +130,7 @@ public abstract class ContentManager {
                             "\nkarma: " + member.getKarma() + "\n");
                 }
                 System.out.print("Enter username to see profile: ");
-                String username = input.next();
+                String username = input.nextLine();
                 for(User member : sub.getMembers())
                 {
                     if(member.getUsername().equals(username))
@@ -147,15 +142,15 @@ public abstract class ContentManager {
                 }
                 break;
             }
-            case 4://leave
+            case "4"://leave
             {
                 sub.LeaveSubSeraphit(user);
                 break;
             }
-            case 5://edit info
+            case "5"://edit info
             {
                 if(checkAdministration(sub, user))
-                    AdminEdition(user, sub);
+                    AdminEdition(sub);
                 else{
                     System.out.println("You don't have access to this option.");
                     Holder();
@@ -166,7 +161,7 @@ public abstract class ContentManager {
 
     public static void searchSub(User user) {
         System.out.print("Find: ");
-        String name = input.next();
+        String name = input.nextLine();
         name = name.toLowerCase();
         boolean found = false;
         for(SubSeraphit sub : allSubs){
@@ -183,13 +178,13 @@ public abstract class ContentManager {
         else
         {
             System.out.print("Which one did you mean? ");
-            String topic = input.next();
+            String topic = input.nextLine();
             ClearScreen();
             for(SubSeraphit sub : allSubs){
                 if(sub.getTopic().equals(topic)){
                     showSeraphit(sub);
                     System.out.println("Enter 1 to join.");
-                    String join = input.next();
+                    String join = input.nextLine();
                     if(join.equals("1"))
                     {
                         sub.getMembers().add(user);
@@ -204,8 +199,8 @@ public abstract class ContentManager {
     public static void showComments(User user, Post post){
         List<Comment> removed = new ArrayList<>();
         for(Comment comment: post.getComments()) {
-            int task = 0;
-            while(task != 1 && task != 3)
+            String task = "2";
+            while(task.equals("2"))
             {
                 ClearScreen();
                 System.out.println(comment.getMaker().getUsername() + "\n" +
@@ -214,42 +209,23 @@ public abstract class ContentManager {
                         "\n\n1- next\n" +
                         "2- react\n" +
                         "3- remove");
-                task = input.nextInt();
-                if(task == 2) {
-                    comment.React(comment, user);
+                task = input.next();
+                if(task.equals("2")) {
+                    comment.ReactComment(comment, user);
                 }
-                else if(task == 3) {
+                else if(task.equals("3")) {
                     removed.add(comment);
                 }
             }
         }
         removeComment(post, removed, user);
         System.out.println("Enter 1 to add a new comment.");
-        int add = input.nextInt();
-        if (add == 1)
+        String add = input.next();
+        if (add.equals("1"))
         {
             System.out.print("text: ");
             String body = in.nextLine();
             newComment(post, user, body);
-        }
-    }
-
-    public static void showUpComments(User user){
-        for(Comment comment: user.getUpComment()) {
-            int task = 0;
-            while(task != 1)
-            {
-                ClearScreen();
-                System.out.println(comment.getMaker().getUsername() + "\n" +
-                        comment.getBody() + "\n" +
-                        "karma: " + comment.getKarma() +
-                        "\n\n1- next\n" +
-                        "2- react\n");
-                task = input.nextInt();
-                if(task == 2) {
-                    comment.React(comment, user);
-                }
-            }
         }
     }
 
@@ -273,7 +249,7 @@ public abstract class ContentManager {
                     case 1:
                         showComments(user, post); break;
                     case 2:
-                        post.React(post, user); break;
+                        post.ReactPost(post, user); break;
                     case 3:
                         user.getSavedPosts().add(post); break;
                     case 4:
@@ -284,6 +260,25 @@ public abstract class ContentManager {
         removePost(removed, user);
     }
 
+    public static void showUpComments(User user){
+        for(Comment comment: user.getUpComment()) {
+            int task = 0;
+            while(task != 1)
+            {
+                ClearScreen();
+                System.out.println(comment.getMaker().getUsername() + "\n" +
+                        comment.getBody() + "\n" +
+                        "karma: " + comment.getKarma() +
+                        "\n\n1- next\n" +
+                        "2- react\n");
+                task = input.nextInt();
+                if(task == 2) {
+                    comment.ReactComment(comment, user);
+                }
+            }
+        }
+    }
+
     //see and make posts in sub, see users and their profile, leaving sub, if admin: add new admin, remove user
     public static void showSeraphit(SubSeraphit sub) {
         System.out.println("- " + sub.getTopic() + "\n" +
@@ -291,19 +286,11 @@ public abstract class ContentManager {
                 sub.getPosts().size() + " posts\n");
     }
 
-    //see if this topic is already taken
-    public static boolean validateTopic(String topic){
-        for (SubSeraphit sub : allSubs)
-        {
-            if(sub.getTopic().equals(topic))
-                return false;
-        }
-        return true;
-    }
 
 
 
 
+    //Controlers
     public static void ClearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();

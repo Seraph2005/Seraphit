@@ -2,8 +2,6 @@ package User;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +88,7 @@ public class User {
         karma += n;
     }
 
-
+    //Functionality
     public void showProfile() {
         System.out.println("Username: " + this.username + "\n" +
                 "karma: " + this.karma + "\n" +
@@ -99,7 +97,4 @@ public class User {
         for(SubSeraphit sub : this.subSeraphits)
             System.out.println("- " + sub.getTopic());
     }
-
-
-
 }
